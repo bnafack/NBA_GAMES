@@ -24,7 +24,7 @@ Adverse_Road<-as.numeric(Adverse_Road)
 Team_ranking$TEAM <-as_factor(Team_ranking$TEAM)
 levels(Team_ranking$TEAM)
 
-team <-select(Team_ranking,TEAM,G,W,L,W_PCT)
+team <-select(Team_ranking,G,W,L,W_PCT)
 team$G <-as.numeric(team$G)
 team$W <-as.numeric(team$W)
 team$L <-as.numeric(team$L)
@@ -35,5 +35,6 @@ names(team)
 str(team)
 ## save wraggling data as csv file 
 write.csv2(team, "new_data/team.csv")
+team<-data.frame(team)
 
-View(team)
+
