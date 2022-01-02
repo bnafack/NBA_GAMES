@@ -1,6 +1,7 @@
 library(tidyverse)
 Team_ranking<-as_tibble(read.csv("data/ranking.csv"))
 a<-nrow(Team_ranking)
+names(Team_ranking)
 
 Home_record<- str_split(Team_ranking$HOME_RECORD, "-")
 road_record<- str_split(Team_ranking$ROAD_RECORD, "-")
@@ -30,9 +31,16 @@ team$W <-as.numeric(team$W)
 team$L <-as.numeric(team$L)
 team$W_PCT <-as.numeric(team$W_PCT)
 
-team<-mutate(team,Home_score,abroad_score,abroad_score,Adverse_Home_score,Adverse_Road)
+team<-mutate(team,SEASON_ID=Team_ranking$SEASON_ID,TEAM_names=Team_ranking$TEAM,Home_score,abroad_score,abroad_score,Adverse_Home_score,Adverse_Road)
 names(team)
 str(team)
+
+# Let's filter the data for training and test 
+
+train_data<- filter(team,!(SEASON_ID==22021 | SEASON_ID == 12021 ))
+test_data <- filter(team,SEASON_ID==22021 | SEASON_ID == 12021)
+
+view(test_data)
 ## save wraggling data as csv file 
 write.csv2(team, "new_data/team.csv")
 team<-data.frame(team)
