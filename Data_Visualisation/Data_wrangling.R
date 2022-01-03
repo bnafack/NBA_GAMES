@@ -1,10 +1,9 @@
 setwd("D:/competition kaggle/NBA_GAMES")
 library(tidyverse)
-library(plyr)
 library(caret) # this library will be used to split the data
 library(mlr3) # this library will be use to build a model 
-library(rpart)
-
+library(plyr)
+library(mlr)
 Team<-as_tibble(read.csv("data/teams.csv"))
 games<-as_tibble(read.csv("data/games.csv"))
 str(Team)
@@ -113,18 +112,141 @@ valid<- train_data[-trainIndex,]
 view(valid)
 view(Train)
 
+# let's visualize the distribution of data 
+sum(Train$HOME_TEAM_WINS==1)
+sum(Train$HOME_TEAM_WINS==0)
+sum(Train$HOME_TEAM_WINS==0)-sum(Train$HOME_TEAM_WINS==1)
 # let's design a model 
 
 
-# logistic regression from mlr package 
+# logistic regression from mlr package
+
 
 winner<- makeClassifTask(data=Train, target="HOME_TEAM_WINS")
 logreg<-makeLearner("classif.logreg")
 logregModel<-train(logreg,winner)
 
-
+print(logregModel)
 # cross-validating our logistic regression model
-logRegWropper<-makeImputeWrapper("classif.logreg",cols=list(Age=imputeMean()))
+logRegWrapper<-makeImputeWrapper("classif.logreg")
+Kfold <-makeResampleDesc(method = "RepCV",folds=5,reps=50,stratify = TRUE)
+Kfold
+
+
+logRegwithImpute<-resample(logRegWrapper,winner,resampling = Kfold, measures = list(acc, fpr, fnr))
+logRegwithImpute
+
+# extracting model parameters 
+
+logRegModelData<-getLearnerModel(logregModel)
+
+coef(logRegModelData)
+
+#prediction of the model 
+
+predicted<-predict(logregModel, newdata = test,type="class")
+truth<-predicted$data$truth
+response<-predicted$data$response
+
+#Now we can compute the classification error rate by comparing `predicted.y` against the expected $y$:
+
+length(which(truth!=response))/length(predicted$data)
+
+
+#Creating confusion matrix   https://www.journaldev.com/46732/confusion-matrix-in-r
+example <- confusionMatrix(data=as_factor(response), reference = as_factor(truth))
+
+#Display results 
+example
+
+
+
+# lm model 
+model<-lm(HOME_TEAM_WINS~.,Train)
+model
+predicted<-predict(model, newdata = test)
+predicted[predicted>=0.5]=1
+predicted[predicted<0.5]=0
+
+predicted
+
+example <- confusionMatrix(data=as_factor(predicted), reference = as_factor(test$HOME_TEAM_WINS))
+
+#Display results 
+example
+
+
+
+#################Decision tree##############################
+winner<- makeClassifTask(data=Train, target="HOME_TEAM_WINS")
+tree <- makeLearner("classif.rpart")
+getParamSet(tree)
+
+## hyperparameter space for tuning
+
+treeParamSpace <- makeParamSet(
+  makeIntegerParam("minsplit", lower = 5, upper = 20),
+  makeIntegerParam("minbucket", lower = 3, upper = 10),
+  makeNumericParam("cp", lower = 0.01, upper = 0.1),
+  makeIntegerParam("maxdepth", lower = 3, upper = 10))
+
+### Defining the random search
+randSearch <- makeTuneControlRandom(maxit = 200)
+cvForTuning <- makeResampleDesc("CV", iters = 5)
+
+### Performing hyperparameter tuning
+
+library(parallel)
+library(parallelMap)
+parallelStartSocket(cpus = detectCores())
+tunedTreePars <- tuneParams(tree, task = winner,
+                            resampling = cvForTuning,
+                            par.set = treeParamSpace,
+                            control = randSearch)
+parallelStop()
+tunedTreePars
+
+## Training the model with the tuned hyperparameters
+tunedTree <- setHyperPars(tree, par.vals = tunedTreePars$x)
+tunedTreeModel <- train(tunedTree, winner)
+
+## prediction 
+predicted<-predict(tunedTreeModel, newdata = test)
+truth<-predicted$data$truth
+response<-predicted$data$response
+
+
+#Creating confusion matrix   https://www.journaldev.com/46732/confusion-matrix-in-r
+example <- confusionMatrix(data=as_factor(response), reference = as_factor(truth))
+
+#Display results 
+example
+
+
+#### Plotting the decision tree
+
+
+install.packages("rpart.plot")
+library(rpart.plot)
+treeModelData <- getLearnerModel(tunedTreeModel)
+rpart.plot(treeModelData, roundint = FALSE,
+           box.palette = "BuBn",
+           type = 5)
+
+#### Cross-validating our decision tree model
+
+outer <- makeResampleDesc("CV", iters = 5)
+treeWrapper <- makeTuneWrapper("classif.rpart", resampling = cvForTuning,
+                               par.set = treeParamSpace,
+                               control = randSearch)
+parallelStartSocket(cpus = detectCores())
+cvWithTuning <- resample(treeWrapper, winner, resampling = outer)
+parallelStop()
+cvWithTuning 
+
+#############################################
+
+
 
 
 # the following step will be use to predicted the winner teams on the season 
