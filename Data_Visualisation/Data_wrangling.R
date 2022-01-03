@@ -68,9 +68,14 @@ sum(is.na(games$HOME_TEAM_WINS))
 # since we are predicted the winner teams, the missing value will affect the prediction, however, for 
 # prediction of the team which will will win the season, it is important to find the right missing value to be accurate
 
+# in this case we used inputation methode because each games is important 
+games<-impute(games$PTS_home, cols = list(PTS_home = imputeMean(),FG_PCT_home = imputeMean(),FT_PCT_home= imputeMean(),
+                                 FG3_PCT_home= imputeMean(),REB_home=imputeMean(),HOME_TEAM_WINS=imputeMean()))
+typeof
 #in this case we are going to use 1
-games<-na.omit(games)
+#games<-na.omit(games)
 
+view(games)
 
 # Let's split our data in train data, which will be used to train the network to predict the outcome 
 # of a single the games
@@ -144,7 +149,7 @@ coef(logRegModelData)
 
 #prediction of the model 
 
-predicted<-predict(logregModel, newdata = test,type="class")
+predicted<-predict(logregModel, newdata = test_data,type="class")
 truth<-predicted$data$truth
 response<-predicted$data$response
 
@@ -164,7 +169,7 @@ example
 # lm model 
 model<-lm(HOME_TEAM_WINS~.,Train)
 model
-predicted<-predict(model, newdata = test)
+predicted<-predict(model, newdata = test_data)
 predicted[predicted>=0.5]=1
 predicted[predicted<0.5]=0
 
@@ -211,7 +216,7 @@ tunedTree <- setHyperPars(tree, par.vals = tunedTreePars$x)
 tunedTreeModel <- train(tunedTree, winner)
 
 ## prediction 
-predicted<-predict(tunedTreeModel, newdata = test)
+predicted<-predict(tunedTreeModel, newdata = test_data)
 truth<-predicted$data$truth
 response<-predicted$data$response
 
@@ -226,7 +231,7 @@ example
 #### Plotting the decision tree
 
 
-install.packages("rpart.plot")
+#install.packages("rpart.plot")
 library(rpart.plot)
 treeModelData <- getLearnerModel(tunedTreeModel)
 rpart.plot(treeModelData, roundint = FALSE,
@@ -246,31 +251,84 @@ cvWithTuning
 
 #############################################
 
+###### Let's extract data to predict the winner seasons starting to "2016-10-24"
+
+view(test)
+
+seasaon1<-filter(test, test$GAME_DATE_EST>="2016-10-24",test$GAME_DATE_EST<="2017-04-14")
+view(seasaon1)
 
 
-
-# the following step will be use to predicted the winner teams on the season 
+# the following step will be used to predicted the 8 winners teams of each conference for play-off   
 
 # extract data for games in different conference 
 
-east_conference<- filter(games,HOME_TEAM_ID==c("Celtics","Nets","Knicks","76ers","Raptors","Bulls",
+east_conference<- filter(seasaon1,HOME_TEAM_ID==c("Celtics","Nets","Knicks","76ers","Raptors","Bulls",
                                               "Cavaliers" ,"Pistons","Pacers","Bucks","Hawks",
                                               "Heat" ,"Magic","Wizards","Hornets" ))
 
-west_conference<- filter(games,HOME_TEAM_ID==c("Pelicans","Mavericks","Nuggets","Warriors",
+west_conference<- filter(seasaon1,HOME_TEAM_ID==c("Pelicans","Mavericks","Nuggets","Warriors",
+                                              "Rockets","Clippers","Lakers","Timberwolves",
+                                              "Suns","Trail Blazers", "Kings","Spurs","Thunder",  
+                                              "Jazz","Grizzlies"))
+
+
+t<-levels(droplevels(west_conference$HOME_TEAM_ID))
+number_of_win_games<-c()
+
+for(i in t){
+  west_conference%>% filter(west_conference$HOME_TEAM_ID==i)->a
+  number_of_win_games<-append(number_of_win_games,sum(a$HOME_TEAM_WINS))
+  }
+
+weast_season<-data.frame(HOME_TEAM_ID= t,number_of_win_games=number_of_win_games)
+
+view(weast_season)
+## east conference
+
+t<-levels(droplevels(east_conference$HOME_TEAM_ID))
+number_of_win_games<-c()
+
+for(i in t){
+  east_conference%>% filter(east_conference$HOME_TEAM_ID==i)->a
+  number_of_win_games<-append(number_of_win_games,sum(a$HOME_TEAM_WINS))
+}
+
+east_season<-data.frame(HOME_TEAM_ID= t,number_of_win_games=number_of_win_games)
+
+view(east_season)
+
+
+
+
+# Let's count the number of winning games of each team.
+
+
+
+l# the following step will be use to predicted the winner teams on the season 
+
+# extract data for games in different conference 
+
+east_conference<- filter(test,HOME_TEAM_ID==c("Celtics","Nets","Knicks","76ers","Raptors","Bulls",
+                                              "Cavaliers" ,"Pistons","Pacers","Bucks","Hawks",
+                                              "Heat" ,"Magic","Wizards","Hornets" ))
+
+west_conference<- filter(test,HOME_TEAM_ID==c("Pelicans","Mavericks","Nuggets","Warriors",
                                                "Rockets","Clippers","Lakers","Timberwolves",
                                                 "Suns","Trail Blazers", "Kings","Spurs","Thunder",  
                                                "Jazz","Grizzlies"))
+
+
 view(west_conference)
 
 # extract games in the same conference
-west_games_sames_conference<- filter(games,VISITOR_TEAM_ID==c("Pelicans","Mavericks","Nuggets","Warriors",
+west_games_sames_conference<- filter(test,VISITOR_TEAM_ID==c("Pelicans","Mavericks","Nuggets","Warriors",
                                                "Rockets","Clippers","Lakers","Timberwolves",
                                                "Suns","Trail Blazers", "Kings","Spurs","Thunder",  
                                                "Jazz","Grizzlies"))
 view(west_games_sames_conference)
 
-east_games_sames_conference<- filter(games,VISITOR_TEAM_ID==c("Celtics","Nets","Knicks","76ers","Raptors","Bulls",
+east_games_sames_conference<- filter(test,VISITOR_TEAM_ID==c("Celtics","Nets","Knicks","76ers","Raptors","Bulls",
                                                "Cavaliers" ,"Pistons","Pacers","Bucks","Hawks",
                                                "Heat" ,"Magic","Wizards","Hornets" ))
 view(east_games_sames_conference)
