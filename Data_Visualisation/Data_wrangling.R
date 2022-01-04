@@ -3,12 +3,13 @@ library(tidyverse)
 library(caret) # this library will be used to split the data
 library(mlr3) # this library will be use to build a model 
 library(plyr)
-library(mlr)
+library(mice)
+
 Team<-as_tibble(read.csv("data/teams.csv"))
 games<-as_tibble(read.csv("data/games.csv"))
 str(Team)
 
-# to change the id team with the names, we are going to use the factors criterions
+# to change the id team with the names, we are going to use the factors criterion
 
 games$HOME_TEAM_ID<-as_factor(games$HOME_TEAM_ID)
 games$TEAM_ID_away<-as_factor(games$TEAM_ID_away)
@@ -44,14 +45,16 @@ games<- games[!duplicated(games$GAME_ID),]
 # Let's check whether we still have duplicate row
 sum(duplicated(games$GAME_ID))
 
+# Let's select home statistic for prediction
 
 games<-select(games,-GAME_STATUS_TEXT,-TEAM_ID_home,-TEAM_ID_away,-PTS_away,
   -FG_PCT_away,-FT_PCT_away,-FG3_PCT_away,-AST_away,-REB_away )
+
 #view(games)
 
 
 
-# number of missing value
+# number of missing values
 sum(is.na(games$PTS_home))
 sum(is.na(games$FG_PCT_home))
 sum(is.na(games$FT_PCT_home))
@@ -62,17 +65,20 @@ sum(is.na(games$HOME_TEAM_WINS))
 
 # Let's handle missing value 
 # we have two possibility 
-# 1- simply exclude cases with missing data from the analysis
+# 1- simply exclude cases with missing data from the analysis, this will end up with droping games
+#which will be a problem when predicted the season winner
+
 # 2- apply an imputation mechanism to fill in the gaps
 
 # since we are predicted the winner teams, the missing value will affect the prediction, however, for 
 # prediction of the team which will will win the season, it is important to find the right missing value to be accurate
 
-# in this case we used inputation methode because each games is important 
-games<-impute(games$PTS_home, cols = list(PTS_home = imputeMean(),FG_PCT_home = imputeMean(),FT_PCT_home= imputeMean(),
-                                 FG3_PCT_home= imputeMean(),REB_home=imputeMean(),HOME_TEAM_WINS=imputeMean()))
-typeof
-#in this case we are going to use 1
+# in this case we used imputation method because each games is important 
+
+t <- mice(games, m=3, maxit = 4, method = 'cart', seed = 500)
+games<-complete(t)
+
+#if we want to use 1, we shall apply the following syntax
 #games<-na.omit(games)
 
 view(games)
@@ -264,14 +270,16 @@ view(seasaon1)
 # extract data for games in different conference 
 
 east_conference<- filter(seasaon1,HOME_TEAM_ID==c("Celtics","Nets","Knicks","76ers","Raptors","Bulls",
-                                              "Cavaliers" ,"Pistons","Pacers","Bucks","Hawks",
-                                              "Heat" ,"Magic","Wizards","Hornets" ))
+                                              "Cavaliers" ,"Pistons","Pacers","Bucks",
+                                              "Heat" ,"Magic","Wizards","Hornets","Hawks" ))
+
+view(east_conference)
 
 west_conference<- filter(seasaon1,HOME_TEAM_ID==c("Pelicans","Mavericks","Nuggets","Warriors",
                                               "Rockets","Clippers","Lakers","Timberwolves",
                                               "Suns","Trail Blazers", "Kings","Spurs","Thunder",  
                                               "Jazz","Grizzlies"))
-
+levels(east_conference$HOME_TEAM_ID)
 
 t<-levels(droplevels(west_conference$HOME_TEAM_ID))
 number_of_win_games<-c()
@@ -284,6 +292,7 @@ for(i in t){
 weast_season<-data.frame(HOME_TEAM_ID= t,number_of_win_games=number_of_win_games)
 
 view(weast_season)
+
 ## east conference
 
 t<-levels(droplevels(east_conference$HOME_TEAM_ID))
