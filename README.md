@@ -13,9 +13,7 @@ which will be a problem when predicted the season winner
  Since we are predicted the winner teams, the missing value will affect the prediction, however, for 
  prediction of the team which will win the season, it is important to find the right missing value to be accurate
 
-# in this case we used imputation method because each games is important 
-
-
+ in this case we used imputation method because each games is important, we got the data in the folder ``new_data``[https://github.com/B23579/NBA_GAMES/tree/main/new_data]
 ***
 # Website refence to understand how NBA works
 
