@@ -3,7 +3,7 @@
 ***
 # Website refence to understand how NBA works
 
-[1]PLAY BALL How many games in an NBA season?  https://docs.google.com/document/d/1p8aflcoVM8KqBZnG_zpFXn0Ruds1RVIA-l32SuOVuBE/edit
+[1] How many games in an NBA season?  https://docs.google.com/document/d/1p8aflcoVM8KqBZnG_zpFXn0Ruds1RVIA-l32SuOVuBE/edit
 
 
 [2] Playoffs NBA 2017 https://fr.wikipedia.org/wiki/Playoffs_NBA_2017
