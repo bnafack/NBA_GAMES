@@ -1,0 +1,94 @@
+setwd("D:/competition kaggle/NBA_GAMES")
+library(tidyverse)
+library(caret) # this library will be used to split the data
+library(mlr3) # this library will be use to build a model 
+
+games<-read.csv("new_data/games.csv")
+
+
+# Let's split our data in train data, which will be used to train the network to predict the outcome 
+# of a single the games
+
+# we will chose 5 seasons games to construct the winner season. 
+
+test<- filter(games,games$GAME_DATE_EST>="2016-10-24")
+
+train_data<- filter(games,games$GAME_DATE_EST<"2016-10-24")
+
+view(train_data)
+
+# in this stage we have to predict whether a specific teams will win or not, so
+# we will used home statistic for prediction 
+
+# feature extraction,
+names(train_data)
+
+train_data<-select(train_data,-GAME_DATE_EST,-GAME_ID,-VISITOR_TEAM_ID, -SEASON,-HOME_TEAM_ID)
+view(train_data)
+
+# let's split the data in test and training set 
+# we shall used the seed function to make our work reproducible 
+
+set.seed(3456)
+trainIndex <- createDataPartition(train_data$HOME_TEAM_WINS, p = .85,
+                                  list = FALSE,
+                                  times = 1)
+Train <- train_data[ trainIndex,]
+test_data <- train_data[-trainIndex,] # this data will be use to test the model 
+
+set.seed(3486)
+trainIndex <- createDataPartition(Train$HOME_TEAM_WINS, p = .80,
+                                  list = FALSE,
+                                  times = 1)
+Train <- train_data[ trainIndex,]
+valid<- train_data[-trainIndex,]
+
+view(valid)
+view(Train)
+
+# let's visualize the distribution of data 
+sum(Train$HOME_TEAM_WINS==1)
+sum(Train$HOME_TEAM_WINS==0)
+sum(Train$HOME_TEAM_WINS==0)-sum(Train$HOME_TEAM_WINS==1)
+# let's design a model 
+
+
+# logistic regression from mlr package
+
+
+winner<- makeClassifTask(data=Train, target="HOME_TEAM_WINS")
+logreg<-makeLearner("classif.logreg")
+logregModel<-train(logreg,winner)
+
+print(logregModel)
+# cross-validating our logistic regression model
+logRegWrapper<-makeImputeWrapper("classif.logreg")
+Kfold <-makeResampleDesc(method = "RepCV",folds=5,reps=50,stratify = TRUE)
+Kfold
+
+
+logRegwithImpute<-resample(logRegWrapper,winner,resampling = Kfold, measures = list(acc, fpr, fnr))
+logRegwithImpute
+
+# extracting model parameters 
+
+logRegModelData<-getLearnerModel(logregModel)
+
+coef(logRegModelData)
+
+#prediction of the model 
+
+predicted<-predict(logregModel, newdata = test_data,type="class")
+truth<-predicted$data$truth
+response<-predicted$data$response
+
+#Now we can compute the classification error rate by comparing `predicted.y` against the expected $y$:
+
+length(which(truth!=response))/length(predicted$data)
+
+
+#Creating confusion matrix   https://www.journaldev.com/46732/confusion-matrix-in-r
+example <- confusionMatrix(data=as_factor(response), reference = as_factor(truth))
+
+#Display results 
+example
