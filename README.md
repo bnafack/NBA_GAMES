@@ -15,7 +15,7 @@ which will be a problem when predicted the season winner
 
  in this case we used imputation method because each games is important, we got the data in the folder [new_data](https://github.com/B23579/NBA_GAMES/tree/main/new_data)
 ***
-# Website refence to understand how NBA works
+# Website refences to understand how NBA works
 
 [1] How many games in an NBA season?  https://docs.google.com/document/d/1p8aflcoVM8KqBZnG_zpFXn0Ruds1RVIA-l32SuOVuBE/edit
 
@@ -23,7 +23,7 @@ which will be a problem when predicted the season winner
 [2] Playoffs NBA 2017 https://fr.wikipedia.org/wiki/Playoffs_NBA_2017
 
 ***
-#References book 
+# References book 
 
 [1] Machine Learning with R, the tidyverse, and mlr by Hefin I. Rhys [https://www.manning.com/books/machine-learning-with-r-the-tidyverse-and-mlr?query=machine%20learning%20with%20r]
  
