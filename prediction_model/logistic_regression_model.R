@@ -1,9 +1,8 @@
 setwd("D:/competition kaggle/NBA_GAMES")
 library(tidyverse)
 library(caret) # this library will be used to split the data
-library(mlr3) # this library will be use to build a model 
-
-games<-read.csv("new_data/games.csv")
+library(mlr)
+games<-read.csv("new_data/games_with_all_stat.csv")
 
 
 # Let's split our data in train data, which will be used to train the network to predict the outcome 
@@ -23,7 +22,7 @@ view(train_data)
 # feature extraction,
 names(train_data)
 
-train_data<-select(train_data,-GAME_DATE_EST,-GAME_ID,-VISITOR_TEAM_ID, -SEASON,-HOME_TEAM_ID)
+train_data<-select(train_data,-GAME_DATE_EST,-VISITOR_TEAM_ID, -SEASON,-HOME_TEAM_ID)
 view(train_data)
 
 # let's split the data in test and training set 
@@ -92,3 +91,6 @@ example <- confusionMatrix(data=as_factor(response), reference = as_factor(truth
 
 #Display results 
 example
+
+# Since our data are imbalance, let's use some imbalance method  
+

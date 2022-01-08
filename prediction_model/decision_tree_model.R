@@ -1,10 +1,11 @@
 
 setwd("D:/competition kaggle/NBA_GAMES")
 library(tidyverse)
+
 library(caret) # this library will be used to split the data
 library(mlr3) # this library will be use to build a model 
 
-games<-read.csv("new_data/games.csv")
+games<-read.csv("new_data/games_with_all_stat.csv")
 
 
 # Let's split our data in train data, which will be used to train the network to predict the outcome 
@@ -24,7 +25,7 @@ view(train_data)
 # feature extraction,
 names(train_data)
 
-train_data<-select(train_data,-GAME_DATE_EST,-GAME_ID,-VISITOR_TEAM_ID, -SEASON,-HOME_TEAM_ID)
+train_data<-select(train_data,-GAME_DATE_EST,-VISITOR_TEAM_ID, -SEASON,-HOME_TEAM_ID)
 view(train_data)
 
 # let's split the data in test and training set 
@@ -37,15 +38,6 @@ trainIndex <- createDataPartition(train_data$HOME_TEAM_WINS, p = .85,
 Train <- train_data[ trainIndex,]
 test_data <- train_data[-trainIndex,] # this data will be use to test the model 
 
-set.seed(3486)
-trainIndex <- createDataPartition(Train$HOME_TEAM_WINS, p = .80,
-                                  list = FALSE,
-                                  times = 1)
-Train <- train_data[ trainIndex,]
-valid<- train_data[-trainIndex,]
-
-view(valid)
-view(Train)
 
 # let's visualize the distribution of data 
 sum(Train$HOME_TEAM_WINS==1)
@@ -100,7 +92,9 @@ example <- confusionMatrix(data=as_factor(response), reference = as_factor(truth
 #Display results 
 example
 
+test_precit<-mutate(test_data,predict_HOME_WIN_SCORE=response)
 
+view(test_precit)
 #### Plotting the decision tree
 
 
@@ -122,5 +116,31 @@ cvWithTuning <- resample(treeWrapper, winner, resampling = outer)
 parallelStop()
 cvWithTuning 
 
+library(ROSE)
+prop.table(table(Train$HOME_TEAM_WINS))
+n<-sum(Train$HOME_TEAM_WINS==1)
+data_balanced_under <- ovun.sample( HOME_TEAM_WINS~ ., data = Train, method = "over", N = 2*n, seed = 1)$data
+table(data_balanced_under$HOME_TEAM_WINS)
+Train<-data_balanced_under
 
+# prediction on unview data, 
 
+view(test)
+
+To_predict<-train_data<-select(test,-GAME_DATE_EST,-VISITOR_TEAM_ID, -SEASON,-HOME_TEAM_ID)
+
+## prediction 
+predicted<-predict(tunedTreeModel, newdata = To_predict)
+truth<-predicted$data$truth
+response<-predicted$data$response
+
+#Creating confusion matrix   https://www.journaldev.com/46732/confusion-matrix-in-r
+example <- confusionMatrix(data=as_factor(response), reference = as_factor(truth))
+
+#Display results 
+example
+
+predictDat<-mutate(test,HOME_WIN_PRED=response)
+
+# Teams that will play play-off
+fwrite(predictDat, "new_data/decison_tree_prediction.csv")

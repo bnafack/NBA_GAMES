@@ -5,7 +5,7 @@ library(caret) # this library will be used to split the data
 library(mlr3) # this library will be use to build a model 
 library(plyr)
 library(data.table)
-games<-read.csv("new_data/games.csv")
+games<-read.csv("new_data/games_with_all_stat.csv.csv")
 
 
 # Let's split our data in train data, which will be used to train the network to predict the outcome 

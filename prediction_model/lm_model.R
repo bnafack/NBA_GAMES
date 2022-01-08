@@ -3,7 +3,7 @@ library(tidyverse)
 library(caret) # this library will be used to split the data
 library(mlr3) # this library will be use to build a model 
 
-games<-read.csv("new_data/games.csv")
+games<-read.csv("new_data/games_with_all_stat.csv")
 
 
 # Let's split our data in train data, which will be used to train the network to predict the outcome 
@@ -23,7 +23,7 @@ view(train_data)
 # feature extraction,
 names(train_data)
 
-train_data<-select(train_data,-GAME_DATE_EST,-GAME_ID,-VISITOR_TEAM_ID, -SEASON,-HOME_TEAM_ID)
+train_data<-select(train_data,-GAME_DATE_EST,-VISITOR_TEAM_ID, -SEASON,-HOME_TEAM_ID)
 view(train_data)
 
 # let's split the data in test and training set 
@@ -48,7 +48,7 @@ view(Train)
 
 # let's visualize the distribution of data 
 sum(Train$HOME_TEAM_WINS==1)
-sum(Train$HOME_TEAM_WINS==0)
+n<-sum(Train$HOME_TEAM_WINS==0)
 sum(Train$HOME_TEAM_WINS==0)-sum(Train$HOME_TEAM_WINS==1)
 # let's design a model 
 
@@ -64,12 +64,32 @@ predicted<-predict(model, newdata = test_data)
 predicted[predicted>=0.5]=1
 predicted[predicted<0.5]=0
 
-predicted
+
 
 example <- confusionMatrix(data=as_factor(predicted), reference = as_factor(test$HOME_TEAM_WINS))
 
 #Display results 
 example
 
+install.packages("ROSE")
+library(ROSE)
+prop.table(table(Train$HOME_TEAM_WINS))
+
+data_balanced_under <- ovun.sample( HOME_TEAM_WINS~ ., data = Train, method = "under", N = 2*n, seed = 1)$data
+table(data_balanced_under$HOME_TEAM_WINS)
+Train<-data_balanced_under
 
 
+# lm model 
+model<-lm(HOME_TEAM_WINS~.,Train)
+model
+predicted<-predict(model, newdata = test_data)
+predicted[predicted>=0.5]=1
+predicted[predicted<0.5]=0
+
+
+
+example <- confusionMatrix(data=as_factor(predicted), reference = as_factor(test$HOME_TEAM_WINS))
+
+#Display results 
+example
