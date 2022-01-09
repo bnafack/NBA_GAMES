@@ -23,6 +23,11 @@ which will be a problem when predicted the season winner
 [2] Playoffs NBA 2017 (https://fr.wikipedia.org/wiki/Playoffs_NBA_2017)
 
 ***
+
+***
+# References articles
+
+***
 # References book 
 
 [1] Machine Learning with R, the tidyverse, and mlr by Hefin I. Rhys (ttps://www.manning.com/books/machine-learning-with-r-the-tidyverse-and-mlr?query=machine%20learning%20with%20r)
