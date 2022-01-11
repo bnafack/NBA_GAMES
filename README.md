@@ -48,7 +48,9 @@ which will be a problem when predicted the season winner
 [2] Playoffs NBA 2017 (https://fr.wikipedia.org/wiki/Playoffs_NBA_2017)
 
 ***
+# Reference dataset
 
+https://www.kaggle.com/nathanlauga/nba-games
 ***
 # References articles
 
