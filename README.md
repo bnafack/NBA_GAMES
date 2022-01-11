@@ -72,6 +72,9 @@ which will be a problem when predicted the season winner
 
  Each game is important for ranking because we are attempting to predict a winning team for the season. Missing values will have an effect on the final ranking prediction from the regular season to the playoffs. As a result, locating the correct missing value is critical. I used the imputation method in this case because each game is important.
   I got the data in the folder [new_data](https://github.com/B23579/NBA_GAMES/tree/main/new_data)
+  
+ # Implementation 
+ All methods in this study were implemented in R. The mlr package was used to implement logistic regression. This package's default settings were set. Using RepCV and the stratify method, we train and cross-validate our logistic regression model.
 ***
 # Website refences to understand how NBA works
 
