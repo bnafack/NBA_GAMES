@@ -8,6 +8,22 @@ The National Basketball Association (NBA) league, founded in 1946, is the world'
 NBA league consists of 30 teams divided into the Eastern and Western conferences. Except in 2020, when the season was cut short by the Covid pandemic, it has always had 82 regular-season games, each team will play 41 away games, and 41 home games. The top eight teams from each conference (Eastern and Western) are chosen to compete for the championship during the playoffs. The rankings are determined by the number of teams winning games in the regular season. The teams then compete against each other, with the first-place team facing the eighth-place team, the second-place team facing the seventh place, etc. Each game will be a best-of-seven series, with teams rotating between home and away. The project aims to predict the winner of a basketball game, the ranking of the NBA Playoffs, the winner of each conference, as well as the winner of the NBA. Predicting basketball games makes it easier for bettors to make informed decisions. It is also interesting to see which factors are closely related to team success. Teams can gain an advantage in winning games through this type of analysis.
 
 ***
+# Data description 
+The dataset we used is from Kaggle's datasets include five data frames. We used the games.csv data frame containing all NBA games statistics from 2004 through December 2021, for our ML prediction. The selected dataset contains the following variables: 
+Games_date: the date of the games,
+PTS home and away: Percent of Team's Points 
+AST home and away: Percent of Team's Assists
+FT PCT home and away: Free Throw Percentage
+REB home and away: Rebounds 
+FG PCT home and away: field goal percentage 
+FG3 PCT home and away:  3 Point Field Goal Percentage
+HOME TEAMS_wing information:  win or lose. 
+SEASON of the games
+HOME and Visitor Teams names 
+
+This dataset contains 25024 rows, 44 duplicated games, and 99 missing values for the following variable: PTS_home, FG_PCT_home, FT_PCT_home, FG3_PCT_home,REB_home , PTS_away, FG_PCT_away, FT_PCT_away, FG3_PCT_home,AST_away, REB_away. 
+
+***
 ##  handle missing value 
 These data are those we get after data cleaning and wrangling. This will be used for model prediction. 
 
