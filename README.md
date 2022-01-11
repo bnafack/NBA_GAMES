@@ -67,6 +67,8 @@ which will be a problem when predicted the season winner
 
 [2] Playoffs NBA 2017 (https://fr.wikipedia.org/wiki/Playoffs_NBA_2017)
 
+[3] [Using Machine Learning to Predict NBA Games] (https://community.wolfram.com/groups/-/m/t/1730466)
+
 ***
 # Reference dataset
 
