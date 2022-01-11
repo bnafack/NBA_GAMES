@@ -50,7 +50,7 @@ This dataset contains 25024 rows, 44 duplicated games, and 99 missing values for
 ***
 # Data cleaning 
 
-# Remouve duplicated games 
+## Remouve duplicated games 
 
 ##  handle missing value 
 
