@@ -9,7 +9,20 @@ NBA league consists of 30 teams divided into the Eastern and Western conferences
 
 ***
 # Data description 
-The dataset we used is from Kaggle's datasets include five data frames. We used the games.csv data frame containing all NBA games statistics from 2004 through December 2021, for our ML prediction. The selected dataset contains the following variables:
+
+The dataset we used is from Kaggle's datasets include five data frames
+
+games.csv: all games from the 2004 season to the last update with the date, teams, and some details like a number of points, etc.
+
+games_details.csv: details of games dataset, all statistics of players for a given game
+
+players.csv: players details (name)
+
+ranking.csv: ranking of NBA given a day (split into west and east on CONFERENCE column
+
+teams.csv: all teams of NBA.
+
+We used the games.csv data frame containing all NBA games statistics from 2004 through December 2021, for our ML prediction. The selected dataset contains the following variables:
 
 Games_date: the date of the games
 
