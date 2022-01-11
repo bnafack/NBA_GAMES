@@ -48,6 +48,10 @@ HOME and Visitor Teams names
 This dataset contains 25024 rows, 44 duplicated games, and 99 missing values for the following variables: PTS_home, FG_PCT_home, FT_PCT_home, FG3_PCT_home,REB_home , PTS_away, FG_PCT_away, FT_PCT_away, FG3_PCT_home,AST_away, REB_away. 
 
 ***
+# Data cleaning 
+
+# Remouve duplicated games 
+
 ##  handle missing value 
 
 To handle the missing value, I had two possibilities: 
