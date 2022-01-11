@@ -9,8 +9,10 @@ NBA league consists of 30 teams divided into the Eastern and Western conferences
 
 ***
 # Data description 
-The dataset we used is from Kaggle's datasets include five data frames. We used the games.csv data frame containing all NBA games statistics from 2004 through December 2021, for our ML prediction. The selected dataset contains the following variables: 
+The dataset we used is from Kaggle's datasets include five data frames. We used the games.csv data frame containing all NBA games statistics from 2004 through December 2021, for our ML prediction. The selected dataset contains the following variables:
+
 Games_date: the date of the games
+
 PTS home and away: Percent of Team's Points
 
 AST home and away: Percent of Team's Assists
@@ -30,7 +32,7 @@ SEASON of the games
 HOME and Visitor Teams names 
 
 
-This dataset contains 25024 rows, 44 duplicated games, and 99 missing values for the following variable: PTS_home, FG_PCT_home, FT_PCT_home, FG3_PCT_home,REB_home , PTS_away, FG_PCT_away, FT_PCT_away, FG3_PCT_home,AST_away, REB_away. 
+This dataset contains 25024 rows, 44 duplicated games, and 99 missing values for the following variables: PTS_home, FG_PCT_home, FT_PCT_home, FG3_PCT_home,REB_home , PTS_away, FG_PCT_away, FT_PCT_away, FG3_PCT_home,AST_away, REB_away. 
 
 ***
 ##  handle missing value 
