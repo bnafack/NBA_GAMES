@@ -15,7 +15,7 @@ NBA league consists of 30 teams divided into the Eastern and Western conferences
 
 Logistic regression is a type of supervised learning method that predicts class membership. A model is trained to predict the probability (p) of new data falling into each class. Typically, new data are assigned to the class to which they are most likely to belong. Data are converted into log-odds (logits), which are then converted into odds and probabilities of belonging to the "positive" class. Cases are assigned to the positive class if their probability exceeds a predetermined threshold (0.5 by default).
 
-
+## Decision Trees Algorithm
 
 
 
