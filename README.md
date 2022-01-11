@@ -10,7 +10,7 @@ NBA league consists of 30 teams divided into the Eastern and Western conferences
 ***
 # Data description 
 
-The dataset we used is from Kaggle's datasets include five data frames
+The dataset we used is from [Kaggle's](https://www.kaggle.com/nathanlauga/nba-games) datasets include five data frames
 
 games.csv: all games from the 2004 season to the last update with the date, teams, and some details like a number of points, etc.
 
@@ -49,10 +49,8 @@ This dataset contains 25024 rows, 44 duplicated games, and 99 missing values for
 
 ***
 ##  handle missing value 
-These data are those we get after data cleaning and wrangling. This will be used for model prediction. 
 
-
- we had two possibilities
+To handle the missing value, I had two possibilities: 
  
 1- simply exclude cases with missing data from the analysis, this will end up with droping games
 which will be a problem when predicted the season winner
