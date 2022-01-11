@@ -52,7 +52,7 @@ This dataset contains 25024 rows, 44 duplicated games, and 99 missing values for
 
 ## Remouve duplicated games 
 
-##  handle missing value 
+##  Handle missing value 
 
 To handle the missing value, I had two possibilities: 
  
