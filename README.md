@@ -71,7 +71,8 @@ which will be a problem when predicted the season winner
 2- apply an imputation mechanism to fill in the gaps
 
  Each game is important for ranking because we are attempting to predict a winning team for the season. Missing values will have an effect on the final ranking prediction from the regular season to the playoffs. As a result, locating the correct missing value is critical. I used the imputation method in this case because each game is important.
-  I got the data in the folder [new_data](https://github.com/B23579/NBA_GAMES/tree/main/new_data)
+  I got the data in the folder [new_data](https://github.com/B23579/NBA_GAMES/tree/main/new_data).
+  I then split the dataset into two-part, one to predict the winner of a game and the second for the playoff ranking predictions starting from 2016 to 2020. Using the caret R package, the first set was divided into 85 % training sets and 15 % testing sets. 
   
  # Implementation 
  All methods in this study were implemented in R. The mlr package was used to implement logistic regression. This package's default settings were set. Using RepCV and the stratify method, we train and cross-validate our logistic regression model.
