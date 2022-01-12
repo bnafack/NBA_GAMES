@@ -75,7 +75,12 @@ which will be a problem when predicted the season winner
   I then split the dataset into two-part, one to predict the winner of a game and the second for the playoff ranking predictions starting from 2016 to 2020. Using the caret R package, the first set was divided into 85 % training sets and 15 % testing sets. 
   
  # Implementation 
- All methods in this study were implemented in R. The mlr package was used to implement logistic regression. This package's default settings were set. Using RepCV and the stratify method, we train and cross-validate our logistic regression model.
+ All methods in this study were implemented in R. The mlr package was used to create a task, learner (specifying "classif.logreg" for logistic regression, "classif.rpart" for the decision tree, and "classif.svm" for SVM), and model. I then train and cross-validate the Logistic Regression model to predict how it will perform. I first define a resampling method with makeResampleDesc(), then apply stratified, 5-fold cross-validation to the wrapped learner 50 times. The cross-validation is then performed using resample().
+
+I tuned the algorithm's hyperparameters for the decision tree using the following hyperparameter space: kernel (values = kernels), degree (lower = 1, upper = 3), cost (lower = 0.1, upper = 10), and gamma (lower = 0.1, upper = 10). Because the hyperparameter space is so large, I chose a random search over a grid search with 5 iterations. I also define a cross-validation strategy for tuning that uses 5-fold cross-validation. To accelerate things by using parallelMap and the parallel R library, I begin parallelization by calling parallelStartSocket() and setting the number of CPUs to the number of CPUs I have available (16). The tuneParams() function is then used to begin the tuning process. When it's finished, I stop parallelization and use the setHyperPars() function to create a learner with the tuned hyperparameters, after which I train a model. The tree is then cross-validated with hyperparameter tuning. The SVM model was created using the same method.
+
+ 
+
 ***
 # Website refences to understand how NBA works
 
