@@ -17,7 +17,11 @@ Logistic regression is a type of supervised learning method that predicts class 
 
 ## Decision Trees Algorithm
 
+The basic idea behind tree-based classification algorithms is that they learn which questions identify cases in different classes. Each case will be sent down the left or right branch based on which criteria it meets. Based on metrics like information gain, the best feature are selected for decision tree induction. After learning, the model can be represented graphically as a tree.
 
+
+## SVM Algorithm 
+The SVM algorithm identifies a linear hyperplane that separates classes. The dimensions of hyperplanes are less than those of variables in a dataset. A hyperplane is a straight line in a two-dimensional space and a surface in a three-dimensional space. They are hard to visualize in a four-dimensional or higher-dimensional feature space, but their concept is the same: they are surfaces that cut through feature space.
 
 
 ***
