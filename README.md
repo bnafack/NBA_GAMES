@@ -93,6 +93,8 @@ I tuned the algorithm's hyperparameters for the decision tree using the followin
 
 [2] Playoffs NBA 2017 (https://fr.wikipedia.org/wiki/Playoffs_NBA_2017)
 
+[3] NBA 2021-22 playoff format: How will the basketball postseason work? (https://bolavip.com/en/nba/nba-2021-22-playoff-format-how-will-the-basketball-postseason-work-20211018-0003.html)
+
 [3] [Using Machine Learning to Predict NBA Games] (https://community.wolfram.com/groups/-/m/t/1730466)
 
 ***
