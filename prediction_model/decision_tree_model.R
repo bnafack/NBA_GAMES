@@ -217,15 +217,32 @@ fwrite(predictDat, "new_data/decision_tree_2016_prediction.csv")
 
 
 
+### visualization of number of point 
+
+ggplot(data = games, mapping = aes(x =PTS_home , y = ..density..)) + 
+  geom_freqpoly( binwidth = 500)
+
+
+ggplot(games) + 
+  geom_bar(mapping = aes(x = PTS_home))
+
+p<-ggplot(games) +
+  geom_density(mapping = aes(x = PTS_home,fill='PTS home'),alpha = .3)+
+  geom_density(mapping = aes(x = PTS_away, fill='PTS away'),alpha = .3)+
+  labs(x="Number of point", y= "Density", title = "Density of points score home and away")+
+  theme(plot.title = element_text(hjust = 0.5))+
+  scale_color_manual(name = "Fill",
+                   breaks = c( "PTS home","PTS away"),
+                   values = c( "PTS home"="Blue","PTS away"="red"),drop=F )
+
+ggsave(p, filename = "density_of_point.png")
 
 
 
 
-
-
-
-
-
+ggplot(games) +
+  geom_density(mapping = aes(x = PTS_home,fill=HOME_TEAM_ID),alpha = .3)
+  
 
 library(ROSE)
 prop.table(table(Train$HOME_TEAM_WINS))

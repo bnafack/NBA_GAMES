@@ -85,6 +85,34 @@ example <- confusionMatrix(data=as_factor(response), reference = as_factor(truth
 #Display results 
 example
 view(Train)
+
+## prediction of test data set##
+
+### play-off###
+
+To_predict<-train_data<-select(test,-GAME_DATE_EST,-VISITOR_TEAM_ID, -SEASON,-HOME_TEAM_ID)
+
+## prediction 
+predicted<-predict(logregModel, newdata = To_predict)
+truth<-predicted$data$truth
+response<-predicted$data$response
+
+#Creating confusion matrix   https://www.journaldev.com/46732/confusion-matrix-in-r
+example <- confusionMatrix(data=as_factor(response), reference = as_factor(truth))
+
+#Display results 
+example
+
+predictDat<-mutate(test,HOME_WIN_PRED=response)
+
+# Teams that will play play-off
+fwrite(predictDat, "new_data/logreg_prediction_2016.csv")
+
+
+
+
+
+
 # features selection
 
 library(Boruta)
@@ -153,4 +181,4 @@ example
 predictDat<-mutate(test,HOME_WIN_PRED=response)
 
 # Teams that will play play-off
-fwrite(predictDat, "new_data/logreg_prediction.csv")
+fwrite(predictDat, "new_data/logreg_prediction_2016.csv")
