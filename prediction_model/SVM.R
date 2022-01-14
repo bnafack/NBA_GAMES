@@ -1,9 +1,9 @@
 
 setwd("D:/competition kaggle/NBA_GAMES")
 library(tidyverse)
-
+library(data.table)
 library(caret) # this library will be used to split the data
-library(mlr3) # this library will be use to build a model 
+library(mlr) # this library will be use to build a model 
 
 games<-read.csv("new_data/games_with_all_stat.csv")
 
@@ -48,7 +48,7 @@ sum(Train$HOME_TEAM_WINS==0)-sum(Train$HOME_TEAM_WINS==1)
 
 
 
-#################Decision tree##############################
+#################SVM##############################
 winner<- makeClassifTask(data=Train, target="HOME_TEAM_WINS")
 svm <- makeLearner("classif.svm")
 getParamSet(svm)
@@ -136,3 +136,88 @@ parallelStop()
 
 ###Extracting the cross-validation result###
 cvWithTuning
+
+
+
+
+
+### SVM with feature selection ####
+
+tet<-select(Train,PTS_home,PTS_away,HOME_TEAM_WINS )
+
+taskt<- makeClassifTask(data=tet, target="HOME_TEAM_WINS")
+svM <- makeLearner("classif.svm")
+getParamSet(svM)
+
+## hyperparameter space for tuning
+
+kernels <- c("polynomial", "radial", "sigmoid")
+svmParamSpace <- makeParamSet(
+  makeDiscreteParam("kernel", values = kernels),
+  makeIntegerParam("degree", lower = 1, upper = 3),
+  makeNumericParam("cost", lower = 0.1, upper = 10),
+  makeNumericParam("gamma", lower = 0.1, 10))
+
+### Defining the random search
+randSearch <- makeTuneControlRandom(maxit = 5)
+cvForTuning <- makeResampleDesc("Holdout", split = 2/3)
+### Performing hyperparameter tuning
+
+parallelStartSocket(cpus = detectCores())
+tunedSvmPars <- tuneParams("classif.svm", task = taskt,
+                           resampling = cvForTuning,
+                           par.set = svmParamSpace,
+                           control = randSearch)
+parallelStop()
+
+#Extracting the winning hyperparameter values from tuning
+
+tunedSvmPars
+tunedSvmPars$x
+
+## Training the model with the tuned hyperparameters
+tunedSvm_1 <- setHyperPars(makeLearner("classif.svm"),
+                         par.vals = tunedSvmPars$x)
+tunedSvmModel_1 <- train(tunedSvm_1, taskt)
+
+testt<-select(test_data,PTS_home,PTS_away,HOME_TEAM_WINS)
+
+## prediction 
+predicted_1<-predict(tunedSvmModel_1, newdata = testt)
+truth_1<-predicted_1$data$truth
+response_1<-predicted_1$data$response
+
+
+#Creating confusion matrix   https://www.journaldev.com/46732/confusion-matrix-in-r
+example_1 <- confusionMatrix(data=as_factor(response_1), reference = as_factor(truth_1))
+
+#Display results 
+example_1
+
+test_precit_1<-mutate(test_data,predict_HOME_WIN_SCORE=response_1)
+
+view(test_precit_1)
+
+
+### play-off###
+
+To_predict_1<-train_data<-select(test,PTS_home,PTS_away,HOME_TEAM_WINS)
+
+## prediction 
+predicted<-predict(tunedSvmModel_1, newdata = To_predict_1)
+truth<-predicted$data$truth
+response<-predicted$data$response
+
+#Creating confusion matrix   https://www.journaldev.com/46732/confusion-matrix-in-r
+example <- confusionMatrix(data=as_factor(response), reference = as_factor(truth))
+
+#Display results 
+example
+
+predictDat<-mutate(test,HOME_WIN_PRED=response)
+
+# Teams that will play play-off
+fwrite(predictDat, "new_data/svm_2016_withfeature_selection_prediction.csv")
+
+
+

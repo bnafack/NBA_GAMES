@@ -1,9 +1,9 @@
 
 setwd("D:/competition kaggle/NBA_GAMES")
 library(tidyverse)
-
+library(data.table)
 library(caret) # this library will be used to split the data
-library(mlr3) # this library will be use to build a model 
+library(mlr) # this library will be use to build a model 
 
 games<-read.csv("new_data/games_with_all_stat.csv")
 
@@ -17,7 +17,7 @@ test<- filter(games,games$GAME_DATE_EST>="2016-10-24")
 
 train_data<- filter(games,games$GAME_DATE_EST<"2016-10-24")
 
-view(train_data)
+#view(train_data)
 
 # in this stage we have to predict whether a specific teams will win or not, so
 # we will used home statistic for prediction 
@@ -116,6 +116,117 @@ cvWithTuning <- resample(treeWrapper, winner, resampling = outer)
 parallelStop()
 cvWithTuning 
 
+
+#### model with feature selection ####
+
+
+#################Decision tree##############################
+tet<-select(Train,PTS_home,PTS_away,HOME_TEAM_WINS )
+
+tr<- makeClassifTask(data=tet, target="HOME_TEAM_WINS")
+treet <- makeLearner("classif.rpart")
+getParamSet(treet)
+
+## hyperparameter space for tuning
+
+treeParamSpacet <- makeParamSet(
+  makeIntegerParam("minsplit", lower = 5, upper = 20),
+  makeIntegerParam("minbucket", lower = 3, upper = 10),
+  makeNumericParam("cp", lower = 0.01, upper = 0.1),
+  makeIntegerParam("maxdepth", lower = 3, upper = 10))
+
+### Defining the random search
+randSearcht <- makeTuneControlRandom(maxit = 200)
+cvForTuningt <- makeResampleDesc("CV", iters = 5)
+
+### Performing hyperparameter tuning
+
+library(parallel)
+library(parallelMap)
+parallelStartSocket(cpus = detectCores())
+tunedTreeParst <- tuneParams(treet, task = tr,
+                            resampling = cvForTuning,
+                            par.set = treeParamSpace,
+                            control = randSearch)
+parallelStop()
+tunedTreeParst
+
+## Training the model with the tuned hyperparameters
+tunedTreet <- setHyperPars(treet, par.vals = tunedTreeParst$x)
+tunedTreeModelt <- train(tunedTreet, tr)
+
+testt<-select(test_data,PTS_home,PTS_away,HOME_TEAM_WINS)
+## prediction 
+predictedt<-predict(tunedTreeModelt, newdata = testt)
+trutht<-predictedt$data$truth
+responset<-predictedt$data$response
+
+
+#Creating confusion matrix   https://www.journaldev.com/46732/confusion-matrix-in-r
+examplet <- confusionMatrix(data=as_factor(responset), reference = as_factor(trutht))
+
+#Display results 
+examplet
+
+test_precitt<-mutate(testt,predict_HOME_WIN_SCORE=responset)
+
+view(test_precitt)
+#### Plotting the decision tree
+
+
+#install.packages("rpart.plot")
+library(rpart.plot)
+treeModelDatat <- getLearnerModel(tunedTreeModelt)
+rpart.plot(treeModelDatat, roundint = FALSE,
+           box.palette = "BuBn",
+           type = 5)
+
+#### Cross-validating our decision tree model
+
+outer <- makeResampleDesc("CV", iters = 5)
+treeWrapper <- makeTuneWrapper("classif.rpart", resampling = cvForTuning,
+                               par.set = treeParamSpace,
+                               control = randSearch)
+parallelStartSocket(cpus = detectCores())
+cvWithTuning <- resample(treeWrapper, winner, resampling = outer)
+parallelStop()
+cvWithTuning 
+
+
+
+
+### play-off###
+
+To_predict_1<-train_data<-select(test,-GAME_DATE_EST,-VISITOR_TEAM_ID, -SEASON,-HOME_TEAM_ID)
+
+## prediction 
+predicted<-predict(tunedTreeModel, newdata = To_predict_1)
+truth<-predicted$data$truth
+response<-predicted$data$response
+
+#Creating confusion matrix   https://www.journaldev.com/46732/confusion-matrix-in-r
+example <- confusionMatrix(data=as_factor(response), reference = as_factor(truth))
+
+#Display results 
+example
+
+predictDat<-mutate(test,HOME_WIN_PRED=response)
+
+# Teams that will play play-off
+fwrite(predictDat, "new_data/decision_tree_2016_prediction.csv")
+
+
+
+
+
+
+
+
+
+
+
+
+
 library(ROSE)
 prop.table(table(Train$HOME_TEAM_WINS))
 n<-sum(Train$HOME_TEAM_WINS==1)
@@ -144,3 +255,4 @@ predictDat<-mutate(test,HOME_WIN_PRED=response)
 
 # Teams that will play play-off
 fwrite(predictDat, "new_data/decison_tree_prediction.csv")
+

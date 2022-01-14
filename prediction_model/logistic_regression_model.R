@@ -2,6 +2,7 @@ setwd("D:/competition kaggle/NBA_GAMES")
 library(tidyverse)
 library(caret) # this library will be used to split the data
 library(mlr)
+library(data.table)
 games<-read.csv("new_data/games_with_all_stat.csv")
 
 
@@ -34,16 +35,8 @@ trainIndex <- createDataPartition(train_data$HOME_TEAM_WINS, p = .85,
                                   times = 1)
 Train <- train_data[ trainIndex,]
 test_data <- train_data[-trainIndex,] # this data will be use to test the model 
-
-set.seed(3486)
-trainIndex <- createDataPartition(Train$HOME_TEAM_WINS, p = .80,
-                                  list = FALSE,
-                                  times = 1)
-Train <- train_data[ trainIndex,]
-valid<- train_data[-trainIndex,]
-
-view(valid)
-view(Train)
+nrow(test_data)
+nrow(Train)
 
 # let's visualize the distribution of data 
 sum(Train$HOME_TEAM_WINS==1)
@@ -91,6 +84,73 @@ example <- confusionMatrix(data=as_factor(response), reference = as_factor(truth
 
 #Display results 
 example
+view(Train)
+# features selection
 
-# Since our data are imbalance, let's use some imbalance method  
+library(Boruta)
+library(mlbench)
 
+library(randomForest)
+set.seed(111)
+boruto<-Boruta(HOME_TEAM_WINS~.,data = Train,doTrace=2, maxRuns=100)
+print(boruto)
+plot(boruto,las=2,cex.axis=0.5)
+plotImpHistory(boruto)
+bor<-TentativeRoughFix(boruto)
+bor
+getNonRejectedFormula(boruto)
+
+
+
+tet<-select(Train,PTS_home,PTS_away,HOME_TEAM_WINS )
+
+mdl<- makeClassifTask(data=tet, target="HOME_TEAM_WINS")
+lr<-makeLearner("classif.logreg")
+logr<-train(lr,mdl)
+#prediction of the model 
+
+testt<-select(test_data,PTS_home,PTS_away,HOME_TEAM_WINS)
+predictedt<-predict(logr, newdata = testt,type="class")
+trutht<-predictedt$data$truth
+responset<-predictedt$data$response
+
+#Now we can compute the classification error rate by comparing `predicted.y` against the expected $y$:
+
+length(which(trutht!=responset))/length(predictedt$data)
+
+
+#Creating confusion matrix   https://www.journaldev.com/46732/confusion-matrix-in-r
+examplet <- confusionMatrix(data=as_factor(responset), reference = as_factor(trutht))
+
+#Display results 
+examplet
+
+# cross-validating our logistic regression model
+logRWrapper<-makeImputeWrapper("classif.logreg")
+Kfoldt <-makeResampleDesc(method = "RepCV",folds=5,reps=50,stratify = TRUE)
+Kfoldt
+
+logRwithImpute<-resample(logRWrapper,mdl,resampling = Kfoldt, measures = list(acc, fpr, fnr))
+logRwithImpute
+
+## prediction of test data set##
+
+### play-off###
+
+To_predict<-train_data<-select(test,PTS_home,PTS_away,HOME_TEAM_WINS)
+
+## prediction 
+predicted<-predict(logr, newdata = To_predict)
+truth<-predicted$data$truth
+response<-predicted$data$response
+
+#Creating confusion matrix   https://www.journaldev.com/46732/confusion-matrix-in-r
+example <- confusionMatrix(data=as_factor(response), reference = as_factor(truth))
+
+#Display results 
+example
+
+predictDat<-mutate(test,HOME_WIN_PRED=response)
+
+# Teams that will play play-off
+fwrite(predictDat, "new_data/logreg_prediction.csv")
