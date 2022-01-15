@@ -99,6 +99,8 @@ I tuned the algorithm's hyperparameters for the decision tree using the followin
 
 [5] NBA Predictions (https://www.pickswise.com/nba/predictions/)
 
+[6] Odds to Make NBA Playoffs (https://www.sportsbettingdime.com/nba/playoff-odds/)
+
 ***
 # Reference dataset
 
