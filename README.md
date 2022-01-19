@@ -83,7 +83,8 @@ which will be a problem when predicted the season winner
 
 I tuned the algorithm's hyperparameters for the decision tree using the following hyperparameter space: kernel (values = kernels), degree (lower = 1, upper = 3), cost (lower = 0.1, upper = 10), and gamma (lower = 0.1, upper = 10). Because the hyperparameter space is so large, I chose a random search over a grid search with 5 iterations. I also define a cross-validation strategy for tuning that uses 5-fold cross-validation. To accelerate things by using parallelMap and the parallel R library, I begin parallelization by calling parallelStartSocket() and setting the number of CPUs to the number of CPUs I have available (16). The tuneParams() function is then used to begin the tuning process. When it's finished, I stop parallelization and use the setHyperPars() function to create a learner with the tuned hyperparameters, after which I train a model. The tree is then cross-validated with hyperparameter tuning. The SVM model was created using the same method. [code](https://github.com/B23579/NBA_GAMES/tree/main/prediction_model)
 
- 
+ # Feature Selection 
+ Using the Buruta R package, 11 iterations were performed to ensure all of our features are considered important. PTS home and away are identified as highly important for winning predictions based on the plot. To win a game, betters and teams should therefore focus on those variables.  
 
 ***
 # Website refences to understand how NBA works
@@ -98,6 +99,8 @@ I tuned the algorithm's hyperparameters for the decision tree using the followin
 [4] Using Machine Learning to Predict NBA Games (https://community.wolfram.com/groups/-/m/t/1730466)
 
 [5] NBA Predictions (https://www.pickswise.com/nba/predictions/)
+
+[6] Odds to Make NBA Playoffs (https://www.sportsbettingdime.com/nba/playoff-odds/)
 
 ***
 # Reference dataset
