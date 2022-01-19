@@ -239,10 +239,13 @@ ggsave(p, filename = "density_of_point.png")
 
 
 
+games1<-filter(games,games$GAME_DATE_EST>="2016-10-24",HOME_TEAM_ID %in%c("Clippers","Jazz","Rockets","Thunder"))
 
-ggplot(games) +
-  geom_density(mapping = aes(x = PTS_home,fill=HOME_TEAM_ID),alpha = .3)
+ggplot(games1) +
+  geom_density(mapping = aes(x = PTS_away,fill=HOME_TEAM_ID),alpha = .3)
   
+
+
 
 library(ROSE)
 prop.table(table(Train$HOME_TEAM_WINS))

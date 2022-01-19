@@ -21,7 +21,7 @@ test$HOME_TEAM_ID<-as.factor(test$HOME_TEAM_ID)
 
 view(test)
 
-seasaon1<-filter(test, test$GAME_DATE_EST>="2019-10-22",test$GAME_DATE_EST<="2020-08-12")
+seasaon1<-filter(test, test$GAME_DATE_EST>="2019-10-22",test$GAME_DATE_EST<="2020-08-14")
 #view(seasaon1)
 
 
@@ -51,7 +51,7 @@ seasaon1$HOME_TEAM_ID<-as.factor(as.character(seasaon1$HOME_TEAM_ID))
 
 
 ######## prediction ######
-nt<-rep(c(2019),times=30)
+nt<-rep(c(2020),times=30)
 
 seasaon1<-mutate(seasaon1, season=nt)
 # the following step will be used to predicted the 8 winners teams of each conference for play-off   
@@ -92,7 +92,7 @@ west_conference<- west_conference[1:8,]
 
 east_conference<- east_conference[1:8,]
 
-view(east_conference)
+#view(east_conference)
 ## we check with the origanal classification in 2016, it confirm our analysis https://fr.wikipedia.org/wiki/Playoffs_NBA_2017
 
 
@@ -112,25 +112,33 @@ view(mergewest_conference)
 fwrite(mergewest_conference,"new_data/west_playoff_sending_score.csv" )
 fwrite(mergeast,"new_data/east_playoff_sending_score.csv" )
 
-ggplot(mergewest_conference) +
+p<- ggplot(mergewest_conference) +
   geom_col(aes(x = HOME_TEAM_ID, y = number_of_win_games),fill = "lightblue", colour = "black")+
   geom_col(aes(x = HOME_TEAM_ID, y = pred_numb_win),fill = "green", colour = "black")+
-  facet_wrap( ~ season, nrow = 3)+
-  labs(x=" Teams sending to playoff", y= "Number of winning games ", title = "Distribution of winning games of teams sending to play of")+
+  facet_wrap( ~ season, nrow = 4)+
+  labs(x=" Teams sending to playoff", y= "Number of winning games ", title = "Distribution of winning games of west conference teams sending to playoff")+
   theme(plot.title = element_text(hjust = 0.5))
+p
   
 
+ggsave(p, filename = "result_visualisation/Distribution_of_winning_games.png")
 
 
-ggplot(mergewest_conference, aes(x = HOME_TEAM_ID, y = number_of_win_games, fill = season)) +
-  geom_col(position = "dodge")
+p<- ggplot(mergeast) +
+  geom_col(aes(x = HOME_TEAM_ID, y = number_of_win_games),fill = "lightblue", colour = "black")+
+  geom_col(aes(x = HOME_TEAM_ID, y = pred_numb_win),fill = "green", colour = "black")+
+  facet_wrap( ~ season, nrow = 4)+
+  labs(x=" Teams sending to playoff", y= "Number of winning games ", title = "Distribution of winning games of east conference teams sending to playoff")+
+  theme(plot.title = element_text(hjust = 0.5))
+p
+
+
+ggsave(p, filename = "result_visualisation/east_Distribution_of_winning_games.png")
 
 
 
-
-
-
-
+boxplot(abs(mergeast$number_of_win_games-mergeast$pred_numb_win))
+boxplot(abs(mergewest_conference$number_of_win_games-mergewest_conference$pred_numb_win))
 
 
 ## Let's arrange the bool for play-off  
