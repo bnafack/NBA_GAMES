@@ -23,6 +23,7 @@ The basic idea behind tree-based classification algorithms is that they learn wh
 ## SVM Algorithm 
 The SVM algorithm identifies a linear hyperplane that separates classes. The dimensions of hyperplanes are less than those of variables in a dataset. A hyperplane is a straight line in a two-dimensional space and a surface in a three-dimensional space. They are hard to visualize in a four-dimensional or higher-dimensional feature space, but their concept is the same: they are surfaces that cut through feature space.
 
+The purpose to use 3 models was to use benchmarking to compare the performance of several algorithms on our particular task. It's helps to chose the best model. 
 
 ***
 # Data description 
